@@ -1171,7 +1171,6 @@ def QA_fetch_get_future_day(code, start_date, end_date, frequence='day', ip=None
 
     with apix.connect(ip, port):
         code_market = extension_market_list.query('code=="{}"'.format(code))
-
         data = pd.concat(
             [apix.to_df(apix.get_instrument_bars(
                 _select_type(frequence),
@@ -1179,11 +1178,13 @@ def QA_fetch_get_future_day(code, start_date, end_date, frequence='day', ip=None
                 str(code),
                 (int(lens / 700) - i) * 700, 700))for i in range(int(lens / 700) + 1)],
             axis=0)
-        data = data.assign(date=data['datetime'].apply(lambda x: str(x[0:10]))).assign(code=str(code))\
-            .assign(date_stamp=data['datetime'].apply(lambda x: QA_util_date_stamp(str(x)[0:10]))).set_index('date', drop=False, inplace=False)
+        if len(data) > 0:
+            data = data.assign(date=data['datetime'].apply(lambda x: str(x[0:10]))).assign(code=str(code))\
+                .assign(date_stamp=data['datetime'].apply(lambda x: QA_util_date_stamp(str(x)[0:10]))).set_index('date', drop=False, inplace=False)
 
-        return data.drop(['year', 'month', 'day', 'hour', 'minute', 'datetime'], axis=1)[start_date:end_date].assign(date=data['date'].apply(lambda x: str(x)[0:10]))
-
+            return data.drop(['year', 'month', 'day', 'hour', 'minute', 'datetime'], axis=1)[start_date:end_date].assign(date=data['date'].apply(lambda x: str(x)[0:10]))
+        else:
+            return []
 
 def QA_fetch_get_future_min(code, start, end, frequence='1min', ip=None, port=None):
     '期货数据 分钟线'

@@ -402,6 +402,45 @@ def QA_fetch_financial_report_adv(code, start, end=None):
         timerange = series.loc[start:end].tolist()
         return QA_DataStruct_Financial(QA_fetch_financial_report(code, timerange))
 
+# TODO finish bitmex kline fetching
+def QA_fetch_bitmex_kline(symbol, start, frequence='1m',  end=None):
+    """返回Bitmex在本地的OHLC数据
+
+    Arguments:
+        symbol {[String]} -- [Instrument symbol]
+        start {[String]} -- [Starting date filter for results]
+        binSize {[String}} -- [Time interval to bucket]
+
+    Keyword Arguments:
+        end {[String]} -- [Ending date filter for results] (default: {None})
+    """
+
+    if frequence in ['1min', '1m']:
+        frequence = '1m'
+    elif frequence in ['5min', '5m']:
+        frequence = '5m'
+    elif frequence in ['60min', '60m', '1h', '1hour']:
+        frequence = '1h'
+    elif frequence in ['1d', '1day']:
+        frequence = '1d'
+    else:
+        # TODO should provide variable time-frame kline by converging 1min kline
+        QA_util_log_info("QA Error QA_fetch_bitmex_kline only support frequence in "
+                         "['1m', '5m', '60m', '1d']")
+        return None
+
+    end = start if end is None else end
+    # import datetime.datetime
+    # try:
+    #     from QUANTAXIS.QAUtil.QASetting import proxies, UTC_TIME_FORMAT
+    #     datetime.strptime(start, UTC_TIME_FORMAT)
+    #     if
+    # except:
+    return None
+
+
+
+
 
 if __name__ == '__main__':
     QA_fetch_stock_realtime_adv(['000001', '000002'], num=10)

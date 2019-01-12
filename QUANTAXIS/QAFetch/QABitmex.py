@@ -4,14 +4,13 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import time
 from requests.exceptions import ConnectTimeout
-from QUANTAXIS.QAUtil.QASetting import proxies
+from QUANTAXIS.QAUtil.QASetting import proxies, UTC_TIME_FORMAT
 from QUANTAXIS.QAUtil import DATABASE, QA_util_log_info, QA_util_log_debug, QA_util_log_expection
 
 # 具体API文档可见
 # https://www.bitmex.com/api/explorer/
 
 Bitmex_base_url = "https://www.bitmex.com"
-UTC_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
 BINSIZE_DICT = {

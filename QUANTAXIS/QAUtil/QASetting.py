@@ -276,4 +276,4 @@ future_ip_list = [
 proxy_url = '127.0.0.1'
 proxy_port = '1080'
 proxies = {'http': 'http://%s:%s' % (proxy_url, proxy_port), 'https': 'http://%s:%s' % (proxy_url, proxy_port)}
-
+UTC_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"

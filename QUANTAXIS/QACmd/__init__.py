@@ -38,6 +38,7 @@ from QUANTAXIS.QASU.main import (QA_SU_save_stock_list, QA_SU_save_stock_min, QA
                        QA_SU_save_stock_block, QA_SU_save_stock_info,QA_SU_save_stock_info_tushare,
                        QA_SU_save_stock_day, QA_SU_save_index_day, QA_SU_save_index_min,
                        QA_SU_save_etf_day, QA_SU_save_etf_min, QA_SU_save_option_day, QA_SU_save_financialfiles)
+from QUANTAXIS.QASU.save_future import QA_SU_save_future_day, QA_SU_save_future_min
 from QUANTAXIS.QASU.save_binance import QA_SU_save_binance_symbol, QA_SU_save_binance_1hour, \
                         QA_SU_save_binance_1day, QA_SU_save_binance_1min, QA_SU_save_binance
 
@@ -184,6 +185,8 @@ class CLI(cmd.Cmd):
             命令格式：save X|x  : save stock_day/xdxr/min index_day/min etf_day/min stock_list/block \n\
             命令格式：save day  : save stock_day/xdxr index_day etf_day stock_list \n\
             命令格式：save min  : save stock_min/xdxr index_min etf_min stock_list \n\
+            命令格式：save future  : save future_day future_min \n\
+            命令格式：save crypto  : save binance huobi bitmex \n\
             ------------------------------------------------------------ \n\
             命令格式：save stock_day  : 保存日线数据 \n\
             命令格式：save stock_xdxr : 保存日除权出息数据 \n\
@@ -197,6 +200,10 @@ class CLI(cmd.Cmd):
             命令格式：save stock_info : 保存tushare数据接口获取的股票列表 \n\
             命令格式：save financialfiles : 保存高级财务数据(自1996年开始) \n\
             命令格式：save option_day : 保存50ETF期权日线数据（不包括已经摘牌的数据） \n\
+            命令格式：save future_day: 保存期货日线数据 \n\
+            命令格式：save future_min: 保存期货分钟线数据 \n\
+            命令格式：save binance: 保存币安所有加密货币对数据 \n\
+            命令格式：save bitmex: 保存bitmex所有加密货币对数据 \n\
             ----------------------------------------------------------\n\
             if you just want to save daily data just\n\
                 save all+ save stock_block+save stock_info, it about 1G data \n\
@@ -281,6 +288,13 @@ class CLI(cmd.Cmd):
                 pass
             elif len(arg) == 1 and arg[0] == "financialfiles":
                 QA_SU_save_financialfiles()
+            elif len(arg) == 1 and arg[0] == 'future':
+                QA_SU_save_future_day()
+                QA_SU_save_future_min()
+            elif len(arg) == 1 and arg[0] == 'future_day':
+                QA_SU_save_future_day()
+            elif len(arg) == 1 and arg[0] == 'future_min':
+                QA_SU_save_future_min()
             else:
                 for i in arg:
                     if i == 'insert_user':
