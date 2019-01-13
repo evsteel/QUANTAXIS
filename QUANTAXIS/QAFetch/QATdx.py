@@ -1462,6 +1462,9 @@ def QA_fetch_get_future_day(code, start_date, end_date, frequence='day', ip=None
 
         return data.drop(['year', 'month', 'day', 'hour', 'minute', 'datetime'], axis=1)[start_date:end_date].assign(date=data['date'].apply(lambda x: str(x)[0:10]))
 
+            return data.drop(['year', 'month', 'day', 'hour', 'minute', 'datetime'], axis=1)[start_date:end_date].assign(date=data['date'].apply(lambda x: str(x)[0:10]))
+        else:
+            return []
 
 def QA_fetch_get_future_min(code, start, end, frequence='1min', ip=None, port=None):
     '期货数据 分钟线'
