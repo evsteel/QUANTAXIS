@@ -17,6 +17,11 @@ from QUANTAXIS.QAUtil.QAcrypto import TIMEOUT, ILOVECHINA
 
 Bitmex_base_url = "https://www.bitmex.com/api/v1/"
 
+proxies = {
+  'http': 'http://127.0.0.1:1080',
+  'https': 'http://127.0.0.1:1080',
+}
+
 MAX_HISTORY = 750
 
 
@@ -26,7 +31,7 @@ def QA_fetch_bitmex_symbols(active=False):
     else:
         url = urljoin(Bitmex_base_url, "instrument")
     try:
-        req = requests.get(url, params={"count":500}, timeout=TIMEOUT)
+        req = requests.get(url, params={"count":500}, timeout=TIMEOUT, proxies=proxies)
     except ConnectTimeout:
         raise ConnectTimeout(ILOVECHINA)
     body = json.loads(req.content)
@@ -41,7 +46,7 @@ def QA_fetch_bitmex_kline(symbol, start_time, end_time, frequency):
             req = requests.get(url, params={"symbol": symbol, "binSize": frequency,
                                             "startTime": start_time.isoformat(),
                                             "endTime": end_time.isoformat(),
-                                            "count":MAX_HISTORY}, timeout=TIMEOUT)
+                                            "count":MAX_HISTORY}, timeout=TIMEOUT, proxies=proxies)
         except ConnectTimeout:
             raise ConnectTimeout(ILOVECHINA)
         # 防止频率过快被断连

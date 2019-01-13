@@ -12,6 +12,11 @@ from requests.exceptions import ConnectTimeout
 from urllib.parse import urljoin
 from QUANTAXIS.QAUtil.QAcrypto import TIMEOUT, ILOVECHINA
 
+proxies = {
+  'http': 'http://127.0.0.1:1080',
+  'https': 'http://127.0.0.1:1080',
+}
+
 Binance_base_url = "https://api.binance.com"
 
 columne_names = ['start_time', 'open', 'high', 'low', 'close', 'volume', 'close_time',
@@ -21,7 +26,7 @@ columne_names = ['start_time', 'open', 'high', 'low', 'close', 'volume', 'close_
 def QA_fetch_binance_symbols():
     url = urljoin(Binance_base_url, "/api/v1/exchangeInfo")
     try:
-        req = requests.get(url, timeout=TIMEOUT)
+        req = requests.get(url, timeout=TIMEOUT, proxies=proxies)
     except ConnectTimeout:
         raise ConnectTimeout(ILOVECHINA)
     body = json.loads(req.content)
@@ -37,7 +42,7 @@ def QA_fetch_binance_kline(symbol, start_time, end_time, frequency):
         try:
             req = requests.get(url, params={"symbol": symbol, "interval": frequency,
                                             "startTime": int(start_time),
-                                            "endTime": int(end_time)}, timeout=TIMEOUT)
+                                            "endTime": int(end_time)}, timeout=TIMEOUT, proxies=proxies)
             # 防止频率过快被断连
             time.sleep(0.5)
         except ConnectTimeout:

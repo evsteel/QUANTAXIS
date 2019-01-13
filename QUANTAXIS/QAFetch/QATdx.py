@@ -521,32 +521,45 @@ def for_sh(code):
 def QA_fetch_get_stock_list(type_='stock', ip=None, port=None):
     ip, port = get_mainmarket_ip(ip, port)
     api = TdxHq_API()
-    with api.connect(ip, port):
-        data = pd.concat([pd.concat([api.to_df(api.get_security_list(j, i * 1000)).assign(sse='sz' if j == 0 else 'sh').set_index(
-            ['code', 'sse'], drop=False) for i in range(int(api.get_security_count(j) / 1000) + 1)], axis=0) for j in range(2)], axis=0)
-        #data.code = data.code.apply(int)
-        sz = data.query('sse=="sz"')
-        sh = data.query('sse=="sh"')
+    data_shsz = []
 
-        sz = sz.assign(sec=sz.code.apply(for_sz))
-        sh = sh.assign(sec=sh.code.apply(for_sh))
+    for j in [0, 1]:
+        if api.connect(ip, port):
+            data_shsz.append(pd.concat([
+                api.to_df(api.get_security_list(j, i * 1000)).assign(sse='sz' if j == 0 else 'sh').set_index(
+                    ['code', 'sse'], drop=False)
+                for i in range(int(api.get_security_count(j) / 1000) + 1)], axis=0))
+            api.disconnect()
 
-        if type_ in ['stock', 'gp']:
+    data = pd.concat([data_shsz[0], data_shsz[1]], axis=0)
+    # with api.connect(ip, port):
+    #     data = pd.concat(
+    #         [pd.concat(
+    #             [api.to_df(api.get_security_list(j, i * 1000)).assign(sse='sz' if j == 0 else 'sh').set_index(
+    #         ['code', 'sse'], drop=False) for i in range(int(api.get_security_count(j) / 1000) + 1)], axis=0) for j in range(2)], axis=0)
+    #     data.code = data.code.apply(int)
+    sz = data.query('sse=="sz"')
+    sh = data.query('sse=="sh"')
 
-            return pd.concat([sz, sh]).query('sec=="stock_cn"').sort_index().assign(name=data['name'].apply(lambda x: str(x)[0:6]))
+    sz = sz.assign(sec=sz.code.apply(for_sz))
+    sh = sh.assign(sec=sh.code.apply(for_sh))
 
-        elif type_ in ['index', 'zs']:
+    if type_ in ['stock', 'gp']:
 
-            return pd.concat([sz, sh]).query('sec=="index_cn"').sort_index().assign(name=data['name'].apply(lambda x: str(x)[0:6]))
-            # .assign(szm=data['name'].apply(lambda x: ''.join([y[0] for y in lazy_pinyin(x)])))\
-            # .assign(quanpin=data['name'].apply(lambda x: ''.join(lazy_pinyin(x))))
-        elif type_ in ['etf', 'ETF']:
-            return pd.concat([sz, sh]).query('sec=="etf_cn"').sort_index().assign(name=data['name'].apply(lambda x: str(x)[0:6]))
+        return pd.concat([sz, sh]).query('sec=="stock_cn"').sort_index().assign(name=data['name'].apply(lambda x: str(x)[0:6]))
 
-        else:
-            return data.assign(code=data['code'].apply(lambda x: str(x))).assign(name=data['name'].apply(lambda x: str(x)[0:6]))
-            # .assign(szm=data['name'].apply(lambda x: ''.join([y[0] for y in lazy_pinyin(x)])))\
-            #    .assign(quanpin=data['name'].apply(lambda x: ''.join(lazy_pinyin(x))))
+    elif type_ in ['index', 'zs']:
+
+        return pd.concat([sz, sh]).query('sec=="index_cn"').sort_index().assign(name=data['name'].apply(lambda x: str(x)[0:6]))
+        # .assign(szm=data['name'].apply(lambda x: ''.join([y[0] for y in lazy_pinyin(x)])))\
+        # .assign(quanpin=data['name'].apply(lambda x: ''.join(lazy_pinyin(x))))
+    elif type_ in ['etf', 'ETF']:
+        return pd.concat([sz, sh]).query('sec=="etf_cn"').sort_index().assign(name=data['name'].apply(lambda x: str(x)[0:6]))
+
+    else:
+        return data.assign(code=data['code'].apply(lambda x: str(x))).assign(name=data['name'].apply(lambda x: str(x)[0:6]))
+        # .assign(szm=data['name'].apply(lambda x: ''.join([y[0] for y in lazy_pinyin(x)])))\
+        #    .assign(quanpin=data['name'].apply(lambda x: ''.join(lazy_pinyin(x))))
 
 
 def QA_fetch_get_index_list(ip=None, port=None):
