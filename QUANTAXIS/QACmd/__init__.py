@@ -359,9 +359,9 @@ class CLI(cmd.Cmd):
                 QA_SU_save_binance(frequency)
             elif len(arg) == 1 and arg[0] == "bitmex":
                 QA_SU_save_bitmex_symbol()
-                QA_SU_save_bitmex(frequency='1m')
-                QA_SU_save_bitmex(frequency='1h')
                 QA_SU_save_bitmex(frequency='1d')
+                QA_SU_save_bitmex(frequency='1h')
+                QA_SU_save_bitmex(frequency='1m')
             elif len(arg) == 1 and arg[0] == "huobi":
                 pass
             elif len(arg) == 1 and arg[0] == "financialfiles":
