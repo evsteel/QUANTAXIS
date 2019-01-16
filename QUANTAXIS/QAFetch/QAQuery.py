@@ -416,6 +416,7 @@ def QA_fetch_future_list(collections=DATABASE.future_list):
 
 
 def QA_fetch_future_tick():
+    # TODO QA_fetch_future_tick
     raise NotImplementedError
 
 
@@ -794,6 +795,9 @@ def QA_fetch_financial_report(code, report_date, ltype='EN', db=DATABASE):
     except Exception as e:
         raise e
 
+def QA_Fetch_bitmex_day():
+    # TODO QA_Fetch_bitmex_day
+    return NotImplementedError
 
 def QA_fetch_stock_financial_calendar(code, start, end=None, format='pd', collections=DATABASE.report_calendar):
     '获取股票日线'
@@ -875,6 +879,28 @@ def QA_fetch_stock_divyield(code, start, end=None, format='pd', collections=DATA
         QA_util_log_info(
             'QA Error QA_fetch_stock_divyield data parameter start=%s end=%s is not right' % (start, end))
 
+def QA_Fetch_bitmex(symbol, start ,end, format='numpy', frequence='1m', collections=DATABASE.bitmex_1d_XBTUSD):
+
+    if frequence in ['1min', '1m']:
+        frequence = '1m'
+    elif frequence in ['5min', '5m']:
+        frequence = '5m'
+    elif frequence in ['60min', '60m', '1h', '1hour']:
+        frequence = '1h'
+    elif frequence in ['1d', '1day']:
+        frequence = '1d'
+    else:
+        # TODO should provide variable time-frame kline by converging 1min kline
+        QA_util_log_info("QA Error QA_fetch_bitmex_kline only support frequence in "
+                         "['1m', '5m', '60m', '1d']")
+        return None
+
+    __data = []
+    cursor = DATABASE['bitmex_%s_%s' % (frequence, symbol)].find({
+        ''
+    })
+
+    return NotImplementedError
 
 if __name__ == '__main__':
     print(QA_fetch_lhb('2006-07-03'))

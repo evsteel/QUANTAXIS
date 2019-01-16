@@ -6,11 +6,13 @@ import requests
 import json
 import datetime
 import time
+import ssl
 import pandas as pd
 from requests.exceptions import ConnectTimeout
 
 from urllib.parse import urljoin
 from QUANTAXIS.QAUtil.QAcrypto import TIMEOUT, ILOVECHINA
+from QUANTAXIS.QAUtil import QA_util_log_info, QA_util_log_debug, QA_util_log_expection
 
 proxies = {
   'http': 'http://127.0.0.1:1080',
@@ -44,9 +46,13 @@ def QA_fetch_binance_kline(symbol, start_time, end_time, frequency):
                                             "startTime": int(start_time),
                                             "endTime": int(end_time)}, timeout=TIMEOUT, proxies=proxies)
             # 防止频率过快被断连
-            time.sleep(0.5)
+            time.sleep(1)
         except ConnectTimeout:
             raise ConnectTimeout(ILOVECHINA)
+        except ssl.SSLError as ex:
+            QA_util_log_info(ex)
+            time.sleep(120)
+            req = requests.get(url, timeout=TIMEOUT, proxies=proxies)
         klines = json.loads(req.content)
         if len(klines) == 0:
             break
