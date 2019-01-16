@@ -31,7 +31,7 @@ by yutiansut
 2017/4/8
 """
 
-__version__ = '1.2.7.dev1'
+__version__ = '1.2.7'
 __author__ = 'yutiansut'
 logo = ' \n \
 ```````````````````````````````````````````````````````````````````````````````````````````````````````````````````````` \n \
@@ -54,7 +54,7 @@ logo = ' \n \
 ```````````````````````````````````````````````````````````````````````````````````````````````````````````````````````` \n '
 
 # fetch methods
-from QUANTAXIS.QAFetch.Fetcher import QA_quotation # 统一的获取接口
+from QUANTAXIS.QAFetch.Fetcher import QA_quotation 
 
 from QUANTAXIS.QAFetch import (
     QA_fetch_get_stock_day,
