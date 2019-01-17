@@ -68,7 +68,8 @@ from QUANTAXIS.QASU.main import (
 from QUANTAXIS.QASU.save_binance import QA_SU_save_binance_symbol, QA_SU_save_binance_1hour, \
     QA_SU_save_binance_1day, QA_SU_save_binance_1min, QA_SU_save_binance
 from QUANTAXIS.QASU.save_bitmex import QA_SU_save_bitmex_symbol, QA_SU_save_bitmex
-
+from QUANTAXIS.QASU.save_binance_ws import QA_SU_subscribe_binance_websocket
+from QUANTAXIS.QASU.save_bitmex_ws import QA_SU_subscribe_bitmex_websocket
 # 东方财富爬虫
 from QUANTAXIS.QASU.main import (QA_SU_crawl_eastmoney)
 
@@ -246,6 +247,9 @@ class CLI(cmd.Cmd):
             命令格式：save binance: 保存币安所有加密货币对数据 \n\
             命令格式：save bitmex: 保存bitmex所有加密货币对数据 \n\
             ----------------------------------------------------------\n\
+            命令格式：save binance_socket : 订阅币安的Websocket逐笔交易数据\n\
+            命令格式：save bitmex_socket : 订阅Bitmex的逐笔交易数据\n\
+            ----------------------------------------------------------\n\
             if you just want to save daily data just\n\
                 save all+ save stock_block+save stock_info, it about 1G data \n\
             if you want to save save the fully data including min level \n\
@@ -357,6 +361,20 @@ class CLI(cmd.Cmd):
             elif len(arg) == 2 and arg[0] == "binance":
                 frequency = arg[1]
                 QA_SU_save_binance(frequency)
+            elif arg[0] == 'binance_socket':
+                if len(arg) == 1:
+                    QA_SU_subscribe_binance_websocket('', is_depth=False)
+                elif len(arg) == 3:
+                    QA_SU_subscribe_binance_websocket(arg[1], arg[2])
+                else:
+                    QA_util_log_info('invalid input, should be "save binance_socket btcusdt,ltcusdt True" ')
+            elif arg[0] == 'bitmex_socket':
+                if len(arg) == 1:
+                    QA_SU_subscribe_bitmex_websocket()
+                elif len(arg) == 3:
+                    QA_SU_subscribe_bitmex_websocket(arg[1], arg[2])
+                else:
+                    QA_util_log_info('invalid input, should be "save bitmex_socket XBTUSD,XBTZ14 True" ')
             elif len(arg) == 1 and arg[0] == "bitmex":
                 QA_SU_save_bitmex_symbol()
                 QA_SU_save_bitmex(frequency='1d')

@@ -93,7 +93,7 @@ logging.basicConfig(
     filemode='w',
 )
 console = logging.StreamHandler()
-console.setLevel(logging.WARNING)
+console.setLevel(logging.DEBUG)
 formatter = logging.Formatter('QUANTAXIS>> %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)

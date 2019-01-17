@@ -49,10 +49,12 @@ def QA_fetch_binance_kline(symbol, start_time, end_time, frequency):
             time.sleep(1)
         except ConnectTimeout:
             raise ConnectTimeout(ILOVECHINA)
-        except ssl.SSLError as ex:
+        except (ssl.SSLError, requests.exceptions.SSLError) as ex:
             QA_util_log_info(ex)
             time.sleep(120)
             req = requests.get(url, timeout=TIMEOUT, proxies=proxies)
+        except Exception as ex:
+            break
         klines = json.loads(req.content)
         if len(klines) == 0:
             break
@@ -67,21 +69,4 @@ def QA_fetch_binance_kline(symbol, start_time, end_time, frequency):
 
 
 if __name__ == '__main__':
-    # url = urljoin(Binance_base_url, "/api/v1/exchangeInfo")
-    # print(url)
-    # a = requests.get(url)
-    # print(a.content)
-    # print(json.loads(a.content))
-    import pytz
-    from dateutil.tz import *
-
-    tz = pytz.timezone("Asia/Shanghai")
-    url = urljoin(Binance_base_url, "/api/v1/klines")
-    start = time.mktime(datetime.datetime(2018, 6, 13, tzinfo=tzutc()).timetuple())
-    end = time.mktime(datetime.datetime(2018, 6, 14, tzinfo=tzutc()).timetuple())
-    print(start * 1000)
-    print(end * 1000)
-    data = QA_fetch_binance_kline("ETHBTC", start, end, '1d')
-    print(len(data))
-    print(data[0])
-    print(data[-1])
+    print(QA_fetch_binance_symbols())
