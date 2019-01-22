@@ -44,7 +44,7 @@ def QA_SU_save_bitmex(client=QASETTING.client, frequency='1m', symbol=''):
         # get symbol start time
         if ref.count() > 0:
             start_timestamp_str = ref.next()['timestamp']
-            QA_util_log_info('UPDATE_SYMBOL \n Trying updating {} from {}'.format(symbol, start_timestamp_str))
+            QA_util_log_info('UPDATE_SYMBOL Trying updating {}_{} from {}'.format(frequency, symbol, start_timestamp_str))
         else:
             start_timestamp_str = QA_fetch_bitmex_kline(symbol=symbol, count=1, reverse='false', binSize=frequency)[0]['timestamp']
             QA_util_log_info('No %s_%s record found, fetching record start time from server %s' %
@@ -56,7 +56,7 @@ def QA_SU_save_bitmex(client=QASETTING.client, frequency='1m', symbol=''):
         end_timestamp_str = QA_fetch_bitmex_kline(symbol=symbol, count=1, reverse='true', binSize=frequency)[0]['timestamp']
         finalEndTime_datetime = datetime.strptime(end_timestamp_str, UTC_TIME_FORMAT)
 
-        while startTime_datetime != finalEndTime_datetime:
+        while startTime_datetime < finalEndTime_datetime:
             # Calculate current request's endTime, if new endTime > finalEndTime then endTime = finalEndtime
             endTime_datetime = (startTime_datetime + BINSIZE_DICT[frequency] * count) \
                 if (startTime_datetime + BINSIZE_DICT[frequency] * count <= finalEndTime_datetime) \

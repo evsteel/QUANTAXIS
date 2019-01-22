@@ -76,9 +76,9 @@ def QA_fetch_bitmex_kline(symbol="XBTUSD",
         req = requests.get(url, timeout=TIMEOUT, proxies=proxies)
         remaining = int(req.headers['x-ratelimit-remaining'])
         if remaining <20:
-            time.sleep(1)
-        elif remaining <10:
             time.sleep(5)
+        elif remaining <10:
+            time.sleep(10)
         elif remaining <3:
             time.sleep(30)
     except ConnectTimeout:
