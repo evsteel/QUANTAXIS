@@ -57,6 +57,7 @@ def QA_fetch_bitmex_funding(symbol='XBTUSD',
     body = json.loads(req.content)
     return body
 
+
 # 获取聚合后的交易记录（k线数据）
 def QA_fetch_bitmex_kline(symbol="XBTUSD",
                           count=100,
@@ -66,95 +67,29 @@ def QA_fetch_bitmex_kline(symbol="XBTUSD",
                           partial='false',
                           reverse='false',
                           proxies=proxies):
+    body = ''
 
+    url = '%s/trade/bucketed?' \
+          'binSize=%s&partial=%s&symbol=%s&count=%d&reverse=%s&startTime=%s&endTime=%s' \
+          % (Bitmex_base_url, binSize, partial, symbol, count, reverse, startTime, endTime)
     try:
-        startTime_datetime = datetime.strptime(startTime, UTC_TIME_FORMAT)
-    except:
-        # Get binSize/Symbol's first record timestamp
-        url = '%s/trade/bucketed?' \
-              'binSize=%s&partial=%s&symbol=%s&count=%d&reverse=%s&startTime=%s&endTime=%s' \
-              % (Bitmex_base_url, binSize, partial, symbol, count, 'false', '', '')
-        QA_util_log_info('Invalid bitmex %s_%s startTime, fetching from server' % (binSize, symbol))
-        try:
-            req = requests.get(url, timeout=TIMEOUT, proxies=proxies)
-            time.sleep(0.5)
-        except ConnectTimeout:
-            raise ConnectTimeout('Bitmex connect timeout when getting symbols.')
-        except (ssl.SSLError, requests.exceptions.SSLError) as ex:
-            QA_util_log_info(ex)
-        startTime_str = json.loads(req.content)[0]['timestamp']
-        startTime_datetime = datetime.strptime(startTime_str, UTC_TIME_FORMAT)
-        QA_util_log_info('Bitmex %s_%s startTime is %s' % (binSize, symbol,startTime_str))
+        req = requests.get(url, timeout=TIMEOUT, proxies=proxies)
+        remaining = int(req.headers['x-ratelimit-remaining'])
+        if remaining <20:
+            time.sleep(1)
+        elif remaining <10:
+            time.sleep(5)
+        elif remaining <3:
+            time.sleep(30)
+    except ConnectTimeout:
+        raise ConnectTimeout('Bitmex connect timeout when getting kline.')
+    except (ssl.SSLError, requests.exceptions.SSLError) as ex:
+        QA_util_log_info(ex)
+    except Exception as ex:
+        QA_util_log_expection(ex)
 
-    try:
-        finalEndTime_datetime = datetime.strptime(endTime, UTC_TIME_FORMAT)
-    except:
-        # Get binSize/Symbol's last record timestamp
-        url = '%s/trade/bucketed?binSize=%s&partial=%s&symbol=%s&count=%d&reverse=%s&startTime=%s&endTime=%s' \
-              % (Bitmex_base_url, binSize, partial, symbol, count, 'true', '', '')
-        QA_util_log_info('Invalid bitmex %s_%s finalTime, fetching from server' % (binSize, symbol))
-        try:
-            req = requests.get(url, timeout=TIMEOUT, proxies=proxies)
-            time.sleep(0.5)
-        except ConnectTimeout:
-            raise ConnectTimeout('Bitmex connect timeout when getting symbols.')
-        except (ssl.SSLError, requests.exceptions.SSLError) as ex:
-            QA_util_log_info(ex)
-        finalEndTime_str = json.loads(req.content)[0]['timestamp']
-        finalEndTime_datetime = datetime.strptime(finalEndTime_str, UTC_TIME_FORMAT)
-        QA_util_log_info('Bitmex %s_%s finalTime is %s' % (binSize, symbol, finalEndTime_str))
-    body = []
+    return json.loads(req.content)
 
-    # begin fetching loop
-    QA_util_log_info("Fetching bitmex %s_%s from %s to %s"
-                     % (binSize, symbol, datetime.strftime(startTime_datetime, UTC_TIME_FORMAT),
-                        datetime.strftime(finalEndTime_datetime, UTC_TIME_FORMAT)))
-    while startTime_datetime != finalEndTime_datetime:
-        # Calculate current request's endTime, if new endTime > finalEndTime then endTime = finalEndtime
-        endTime_datetime = (startTime_datetime + BINSIZE_DICT[binSize] * count) \
-            if (startTime_datetime + BINSIZE_DICT[binSize] * count <= finalEndTime_datetime) \
-            else finalEndTime_datetime
-        startTime_str = datetime.strftime(startTime_datetime, UTC_TIME_FORMAT)
-        endTime_str = datetime.strftime(endTime_datetime, UTC_TIME_FORMAT)
-
-        url = '%s/trade/bucketed?' \
-              'binSize=%s&partial=%s&symbol=%s&count=%d&reverse=%s&startTime=%s&endTime=%s' \
-              % (Bitmex_base_url, binSize, partial, symbol, count, reverse, startTime_str, endTime_str)
-        try:
-            req = requests.get(url, timeout=TIMEOUT, proxies=proxies)
-            remaining = int(req.headers['x-ratelimit-remaining'])
-            if remaining <20:
-                time.sleep(1)
-            elif remaining <10:
-                time.sleep(5)
-            elif remaining <3:
-                time.sleep(30)
-        except ConnectTimeout:
-            raise ConnectTimeout('Bitmex connect timeout when getting symbols.')
-            return body
-        except (ssl.SSLError, requests.exceptions.SSLError) as ex:
-            QA_util_log_info(ex)
-            return body
-        except Exception as ex:
-            QA_util_log_expection(ex)
-            return body
-        body += json.loads(req.content)
-
-        # finish query, break loop
-        if endTime_datetime == finalEndTime_datetime:
-            break
-        else:
-            # Calculate next request's startTime
-            startTime_datetime = endTime_datetime + BINSIZE_DICT[binSize]
-
-        QA_util_log_info('Fetch completed, bitmex %s_%s from %s to %s, total %d records'
-                         % (binSize, symbol, startTime_str, endTime_datetime, len(body)))
-    return body
 
 if __name__ == '__main__':
-    # print(QA_fetch_bitmex_funding(symbol='XBTUSD'))
-    # QA_fetch_bitmex_kline(symbol='XBTUSD', binSize='1d')
-    # result1 = QA_fetch_bitmex_symbols()
-    result2 = QA_fetch_bitmex_symbols(active=False)
-    # print(result1)
-    print(result2)
+    pass
