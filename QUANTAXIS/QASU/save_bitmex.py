@@ -19,7 +19,7 @@ BINSIZE_DICT = {
 
 def QA_SU_save_bitmex(client=QASETTING.client, frequency='1m', symbol=''):
 
-    count = 10
+    count = 100
 
     col = client.bitmex[frequency]
     col.create_index([("symbol", pymongo.ASCENDING), ("timestamp", pymongo.ASCENDING)], unique=True)
